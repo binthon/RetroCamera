@@ -81,5 +81,8 @@ dependencies {
     implementation("androidx.camera:camera-video:1.3.0")
     implementation("jp.co.cyberagent.android:gpuimage:2.1.0")
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.compose.material3:material3:1.1.2")
 
 }

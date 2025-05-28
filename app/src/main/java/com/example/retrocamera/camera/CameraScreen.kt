@@ -7,10 +7,11 @@ import android.graphics.SurfaceTexture
 import android.opengl.GLSurfaceView
 import android.util.Size
 import android.view.Surface
-import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -20,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
@@ -93,7 +95,6 @@ fun CameraShaderScreen(
 
     Box(Modifier.fillMaxSize()) {
         AndroidView(factory = { glSurfaceView }, modifier = Modifier.fillMaxSize())
-        // Filtr
         ShaderFilterDropdown(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -113,23 +114,57 @@ fun ShaderFilterDropdown(
     var selectedLabel by remember { mutableStateOf("Normal") }
 
     Box(modifier) {
-        OutlinedTextField(
-            value = selectedLabel,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Filtr") },
-            trailingIcon = {
-                IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
-                }
-            },
-            modifier = Modifier.width(150.dp)
-        )
+        Box(
+            modifier = Modifier
+                .padding(top = 24.dp)
+                .width(150.dp)
+                .background(Color(0xFF4A148C), shape = MaterialTheme.shapes.medium)
+                .padding(horizontal = 6.dp, vertical = 8.dp)
+        ) {
+            Column {
+                Text("Filtr", color = Color.White)
 
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                Divider(
+                    color = Color.White.copy(alpha = 0.6f),
+                    thickness = 1.dp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, bottom = 6.dp)
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clickable { expanded = true }
+                ) {
+                    Text(
+                        text = selectedLabel,
+                        color = Color.White,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Icon(
+                        Icons.Default.ArrowDropDown,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .background(Color(0xFFEDE7F6))
+        ) {
             options.forEach { label ->
                 DropdownMenuItem(
-                    text = { Text(label) },
+                    text = {
+                        Text(
+                            label,
+                            color = Color(0xFF4A148C)
+                        )
+                    },
                     onClick = {
                         selectedLabel = label
                         expanded = false
@@ -139,4 +174,5 @@ fun ShaderFilterDropdown(
             }
         }
     }
+
 }

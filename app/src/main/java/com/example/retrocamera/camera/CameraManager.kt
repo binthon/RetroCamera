@@ -18,12 +18,12 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -119,7 +119,7 @@ class CameraManager(
     }
 
     @Composable
-    fun ShowCameraWithShader() {
+    fun ShowCameraWithShader(onGalleryClick: () -> Unit) {
         val glSurfaceRef = remember { mutableStateOf<SurfaceView?>(null) }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -128,12 +128,13 @@ class CameraManager(
                 surfaceViewSetter = { glSurfaceRef.value = it }
             )
 
+            // ✅ Prawy dolny róg — przyciski zdjęcie/wideo
             Column(
                 modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 32.dp, top = 32.dp, bottom = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 50.dp, bottom = 50.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 FloatingActionButton(onClick = {
                     val view = glSurfaceRef.value
@@ -142,29 +143,40 @@ class CameraManager(
                         return@FloatingActionButton
                     }
 
-                    val outBitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+                    val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
                     val handler = Handler(Looper.getMainLooper())
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        PixelCopy.request(view, outBitmap, { result ->
+                        PixelCopy.request(view, bitmap, { result ->
                             if (result == PixelCopy.SUCCESS) {
-                                saveBitmapToGallery(outBitmap)
-                            } else {
-                                Toast.makeText(context, "PixelCopy error: $result", Toast.LENGTH_SHORT).show()
+                                saveBitmapToGallery(bitmap)
                             }
                         }, handler)
                     } else {
-                        Toast.makeText(context, "PixelCopy wymaga Androida 7.0+", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Wymaga Androida 7.0+", Toast.LENGTH_SHORT).show()
                     }
                 }) {
                     Icon(Icons.Default.Camera, contentDescription = "Zrób zdjęcie")
                 }
 
                 FloatingActionButton(onClick = {
-                    Toast.makeText(context, "Nagrywanie wideo wyłączone", Toast.LENGTH_SHORT).show()
+                    // nagrywanie
                 }) {
-                    Icon(Icons.Default.Videocam, contentDescription = "Nagrywanie wyłączone")
+                    Icon(Icons.Default.Videocam, contentDescription = "Nagrywaj")
                 }
             }
+
+            // ✅ Lewy dolny róg — przycisk galerii
+            FloatingActionButton(
+                onClick = onGalleryClick,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+                    .padding(bottom = 50.dp)
+            ) {
+                Icon(Icons.Default.PhotoLibrary, contentDescription = "Galeria")
+            }
         }
+
     }
 }
