@@ -160,22 +160,33 @@ class CameraShaderRenderer(
 
 
         val fragmentShaderCode = when (filter) {
-            "Sepia" -> """
-                #extension GL_OES_EGL_image_external : require
-                precision mediump float;
-                uniform samplerExternalOES uTexture;
-                varying vec2 vTexCoord;
-                void main() {
-                    vec4 c = texture2D(uTexture, vTexCoord);
-                    float r = c.r, g = c.g, b = c.b;
-                    gl_FragColor = vec4(
-                        r * 0.393 + g * 0.769 + b * 0.189,
-                        r * 0.349 + g * 0.686 + b * 0.168,
-                        r * 0.272 + g * 0.534 + b * 0.131,
-                        c.a
-                    );
-                }
-            """.trimIndent()
+            "Thermal" -> """
+                    #extension GL_OES_EGL_image_external : require
+                    precision mediump float;
+                    uniform samplerExternalOES uTexture;
+                    varying vec2 vTexCoord;
+                
+                    void main() {
+                        vec4 color = texture2D(uTexture, vTexCoord);
+                        float intensity = dot(color.rgb, vec3(0.299, 0.587, 0.114)); // luminancja
+                
+                        vec3 mapped;
+                        if (intensity < 0.2) {
+                            mapped = vec3(0.0, 0.0, intensity * 5.0);
+                        } else if (intensity < 0.4) {
+                            mapped = vec3(0.0, (intensity - 0.2) * 5.0, 1.0);
+                        } else if (intensity < 0.6) {
+                            mapped = vec3((intensity - 0.4) * 5.0, 1.0, 1.0 - (intensity - 0.4) * 5.0);
+                        } else if (intensity < 0.8) {
+                            mapped = vec3(1.0, 1.0 - (intensity - 0.6) * 5.0, 0.0);
+                        } else {
+                            mapped = vec3(1.0 - (intensity - 0.8) * 5.0, 0.0, 0.0);
+                        }
+                
+                        gl_FragColor = vec4(mapped, 1.0);
+                    }
+                """.trimIndent()
+
 
             "Grayscale" -> """
                 #extension GL_OES_EGL_image_external : require
@@ -225,52 +236,6 @@ class CameraShaderRenderer(
             
                     // Clamp to 0-1
                     gl_FragColor = vec4(clamp(color.rgb, 0.0, 1.0), 1.0);
-                }
-            """.trimIndent()
-
-            "GameBoy" -> """
-                #extension GL_OES_EGL_image_external : require
-                precision mediump float;
-            
-                uniform samplerExternalOES uTexture;
-                varying vec2 vTexCoord;
-            
-                void main() {
-                    vec4 color = texture2D(uTexture, vTexCoord);
-                    float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-            
-                    // Smooth 8-level brightness steps
-                    float level = floor(gray * 8.0) / 8.0;
-            
-                    // Soft green tint
-                    vec3 green = vec3(0.3, 0.55, 0.3);
-                    gl_FragColor = vec4(green * level, 1.0);
-                }
-            """.trimIndent()
-
-            "8bit" -> """
-                #extension GL_OES_EGL_image_external : require
-                precision mediump float;
-            
-                uniform samplerExternalOES uTexture;
-                varying vec2 vTexCoord;
-            
-                // Posterize pomocnicza funkcja
-                vec3 posterize(vec3 color, float levels) {
-                    return floor(color * levels) / levels;
-                }
-            
-                void main() {
-                    vec4 texColor = texture2D(uTexture, vTexCoord);
-            
-                    // Posterizacja — redukcja liczby kolorów
-                    vec3 reduced = posterize(texColor.rgb, 6.0); // tylko 4 poziomy na kanał (czyli 64 kolory)
-            
-                    // Dithering (symulacja ditheringu Bayera)
-                    float grid = mod(gl_FragCoord.x + gl_FragCoord.y, 2.0);
-                    reduced += grid * 0.02;
-            
-                    gl_FragColor = vec4(clamp(reduced, 0.0, 1.0), texColor.a);
                 }
             """.trimIndent()
 
@@ -372,6 +337,98 @@ class CameraShaderRenderer(
                 }
             """.trimIndent()
 
+            "GameBoy" -> """
+                #extension GL_OES_EGL_image_external : require
+                precision mediump float;
+            
+                uniform samplerExternalOES uTexture;
+                varying vec2 vTexCoord;
+            
+                void main() {
+                    vec4 color = texture2D(uTexture, vTexCoord);
+                    float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+            
+                    // Smooth 8-level brightness steps
+                    float level = floor(gray * 8.0) / 8.0;
+            
+                    // Soft green tint
+                    vec3 green = vec3(0.3, 0.55, 0.3);
+                    gl_FragColor = vec4(green * level, 1.0);
+                }
+            """.trimIndent()
+
+
+            "8bit" -> """
+                #extension GL_OES_EGL_image_external : require
+                precision mediump float;
+            
+                uniform samplerExternalOES uTexture;
+                varying vec2 vTexCoord;
+            
+                // Posterize pomocnicza funkcja
+                vec3 posterize(vec3 color, float levels) {
+                    return floor(color * levels) / levels;
+                }
+            
+                void main() {
+                    vec4 texColor = texture2D(uTexture, vTexCoord);
+            
+                    // Posterizacja — redukcja liczby kolorów
+                    vec3 reduced = posterize(texColor.rgb, 6.0); // tylko 4 poziomy na kanał (czyli 64 kolory)
+            
+                    // Dithering (symulacja ditheringu Bayera)
+                    float grid = mod(gl_FragCoord.x + gl_FragCoord.y, 2.0);
+                    reduced += grid * 0.02;
+            
+                    gl_FragColor = vec4(clamp(reduced, 0.0, 1.0), texColor.a);
+                }
+            """.trimIndent()
+            "Sobel" -> """
+                #extension GL_OES_EGL_image_external : require
+                precision mediump float;
+                uniform samplerExternalOES uTexture;
+                varying vec2 vTexCoord;
+            
+                void main() {
+                    float dx = 1.0 / 512.0; // dostosuj do rozdzielczości tekstury
+                    float dy = 1.0 / 512.0;
+            
+                    vec3 tc0 = texture2D(uTexture, vTexCoord + vec2(-dx, -dy)).rgb;
+                    vec3 tc1 = texture2D(uTexture, vTexCoord + vec2( 0.0, -dy)).rgb;
+                    vec3 tc2 = texture2D(uTexture, vTexCoord + vec2( dx, -dy)).rgb;
+                    vec3 tc3 = texture2D(uTexture, vTexCoord + vec2(-dx,  0.0)).rgb;
+                    vec3 tc4 = texture2D(uTexture, vTexCoord + vec2( dx,  0.0)).rgb;
+                    vec3 tc5 = texture2D(uTexture, vTexCoord + vec2(-dx,  dy)).rgb;
+                    vec3 tc6 = texture2D(uTexture, vTexCoord + vec2( 0.0,  dy)).rgb;
+                    vec3 tc7 = texture2D(uTexture, vTexCoord + vec2( dx,  dy)).rgb;
+            
+                    vec3 sobelX = -tc0 - 2.0 * tc3 - tc5 + tc2 + 2.0 * tc4 + tc7;
+                    vec3 sobelY = -tc0 - 2.0 * tc1 - tc2 + tc5 + 2.0 * tc6 + tc7;
+            
+                    float edge = length(sobelX + sobelY);
+                    gl_FragColor = vec4(vec3(edge), 1.0);
+                }
+            """.trimIndent()
+            "Glitch" -> """
+            #extension GL_OES_EGL_image_external : require
+            precision mediump float;
+            uniform samplerExternalOES uTexture;
+            varying vec2 vTexCoord;
+        
+            float rand(vec2 co) {
+                return fract(sin(dot(co, vec2(12.9898,78.233))) * 43758.5453);
+            }
+        
+            void main() {
+                vec2 uv = vTexCoord;
+                uv.x += sin(uv.y * 50.0) * 0.01 * rand(uv);
+        
+                vec4 color = texture2D(uTexture, uv);
+                float noise = rand(gl_FragCoord.xy) * 0.1;
+                gl_FragColor = vec4(clamp(color.rgb + noise, 0.0, 1.0), color.a);
+            }
+        """.trimIndent()
+
             else -> """
                 #extension GL_OES_EGL_image_external : require
                 precision mediump float;
@@ -400,4 +457,7 @@ class CameraShaderRenderer(
         GLES20.glCompileShader(shader)
         return shader
     }
+
+    fun getSurfaceTexture(): SurfaceTexture? = surfaceTexture.value
+
 }
