@@ -35,7 +35,6 @@ class MainActivity : ComponentActivity() {
                         viewModel = GalleryViewModel(this@MainActivity),
                         onBackToCamera = { navController.popBackStack() }
                     )
-
                 }
             }
 

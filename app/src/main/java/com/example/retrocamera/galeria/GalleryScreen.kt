@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
@@ -20,7 +21,8 @@ import coil.compose.rememberAsyncImagePainter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GalleryScreen(viewModel: GalleryViewModel, onBackToCamera: () -> Unit) {
-    var selectedImage by remember { mutableStateOf<Uri?>(null) }
+    var selectedImage by rememberSaveable { mutableStateOf<Uri?>(null) }
+
 
     Scaffold(
         topBar = {

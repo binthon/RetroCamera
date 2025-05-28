@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,7 +57,7 @@ fun CameraShaderScreen(
         return
     }
 
-    val selectedFilter = remember { mutableStateOf("Normal") }
+    val selectedFilter = rememberSaveable { mutableStateOf("Normal") }
     val cameraTextureId = remember { IntArray(1) }
     val surfaceTexture = remember { mutableStateOf<SurfaceTexture?>(null) }
 
@@ -111,7 +112,7 @@ fun ShaderFilterDropdown(
 ) {
     val options = listOf("Normal", "Sepia", "Grayscale", "OldFilm", "VHS", "8mm", "Vintage", "GameBoy", "8bit")
     var expanded by remember { mutableStateOf(false) }
-    var selectedLabel by remember { mutableStateOf("Normal") }
+    var selectedLabel by rememberSaveable { mutableStateOf("Normal") }
 
     Box(modifier) {
         Box(
