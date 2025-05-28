@@ -6,6 +6,8 @@ import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.graphics.Matrix
+import android.view.Surface
+import android.view.WindowManager
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import java.nio.IntBuffer
@@ -13,6 +15,7 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class CameraShaderRenderer(
+    private val context: android.content.Context,
     private val cameraTextureId: IntArray,
     private val surfaceTexture: MutableState<SurfaceTexture?>,
     private val selectedFilter: State<String>
@@ -61,8 +64,13 @@ class CameraShaderRenderer(
             -1f, -1f, 1f, -1f, -1f, 1f, 1f, 1f
         )
 
+        val rotation = (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+
         val texCoords = floatArrayOf(
-            0f, 1f, 1f, 1f, 0f, 0f, 1f, 0f
+            0f, 1f,
+            1f, 1f,
+            0f, 0f,
+            1f, 0f
         )
 
         val vertexBuffer = java.nio.ByteBuffer.allocateDirect(vertexCoords.size * 4)
@@ -124,16 +132,31 @@ class CameraShaderRenderer(
         captureCallback = callback
     }
 
+
     private fun compileShaderProgram(filter: String): Int {
-        val vertexShaderCode = """
-            attribute vec4 aPosition;
-            attribute vec2 aTexCoord;
-            varying vec2 vTexCoord;
-            void main() {
-                gl_Position = aPosition;
-                vTexCoord = aTexCoord;
-            }
-        """.trimIndent()
+        val rotation = (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
+
+        val vertexShaderCode = if (rotation == Surface.ROTATION_0) {
+            """
+                attribute vec4 aPosition;
+                attribute vec2 aTexCoord;
+                varying vec2 vTexCoord;
+                void main() {
+                    gl_Position = aPosition;
+                    vTexCoord = vec2(aTexCoord.y, 1.0 - aTexCoord.x);
+                }
+            """
+        } else {
+            """
+                attribute vec4 aPosition;
+                attribute vec2 aTexCoord;
+                varying vec2 vTexCoord;
+                void main() {
+                    gl_Position = aPosition;
+                    vTexCoord = aTexCoord;
+                }
+            """
+        }.trimIndent()
 
 
         val fragmentShaderCode = when (filter) {

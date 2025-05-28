@@ -62,12 +62,13 @@ fun CameraShaderScreen(
         GLSurfaceView(context).apply {
             setEGLContextClientVersion(2)
             val renderer = CameraShaderRenderer(
+                context = context,
                 cameraTextureId = cameraTextureId,
                 surfaceTexture = surfaceTexture,
                 selectedFilter = selectedFilter
             )
             shaderRendererSetter(renderer)
-            surfaceViewSetter(this) // ← TO dodaje SurfaceView do CameraManager
+            surfaceViewSetter(this)
             setRenderer(renderer)
             renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         }
