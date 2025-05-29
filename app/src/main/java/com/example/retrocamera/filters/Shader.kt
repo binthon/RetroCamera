@@ -428,7 +428,25 @@ class CameraShaderRenderer(
                 gl_FragColor = vec4(clamp(color.rgb + noise, 0.0, 1.0), color.a);
             }
         """.trimIndent()
-
+            "Neon" -> """
+                #extension GL_OES_EGL_image_external : require
+                precision mediump float;
+                uniform samplerExternalOES uTexture;
+                varying vec2 vTexCoord;
+            
+                void main() {
+                    vec4 texColor = texture2D(uTexture, vTexCoord);
+            
+                    // Vaporwave gradient overlay (cyan to magenta)
+                    float gradient = sin(vTexCoord.y * 10.0) * 0.5 + 0.5;
+                    vec3 vaporColor = mix(vec3(0.0, 1.0, 1.0), vec3(1.0, 0.0, 1.0), gradient);
+            
+                    // Mix original with vaporwave overlay
+                    vec3 finalColor = mix(texColor.rgb, vaporColor, 0.25); // 0.25 = 25% tint
+            
+                    gl_FragColor = vec4(finalColor, texColor.a);
+                }
+            """.trimIndent()
             else -> """
                 #extension GL_OES_EGL_image_external : require
                 precision mediump float;

@@ -110,7 +110,7 @@ fun ShaderFilterDropdown(
     modifier: Modifier = Modifier,
     onFilterSelected: (String) -> Unit
 ) {
-    val options = listOf("Normal", "Thermal", "Grayscale", "OldFilm", "VHS", "8mm", "Vintage", "GameBoy", "8bit","Sobel","Glitch")
+    val options = listOf("Normal", "Thermal", "Grayscale", "OldFilm", "VHS", "8mm", "Vintage", "GameBoy", "8bit","Sobel","Glitch","Neon")
     var expanded by remember { mutableStateOf(false) }
     var selectedLabel by rememberSaveable { mutableStateOf("Normal") }
 
