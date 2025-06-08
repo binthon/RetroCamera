@@ -29,15 +29,10 @@ import java.util.*
 
 
 class CameraManager(
-    private val context: Context
+    private val context: Context,
+    private val viewModel: CameraViewModel
 ) {
-    private var shaderRenderer: CameraShaderRenderer? = null
 
-
-
-    fun setShaderRenderer(renderer: CameraShaderRenderer) {
-        shaderRenderer = renderer
-    }
 
     private fun saveBitmapToGallery(bitmap: Bitmap) {
         val filename = "ShaderPhoto_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.jpg"
@@ -73,11 +68,11 @@ class CameraManager(
 
         Box(modifier = Modifier.fillMaxSize()) {
             CameraShaderScreen(
-                shaderRendererSetter = { setShaderRenderer(it) },
+                shaderRendererSetter = { viewModel.shaderRenderer.value = it },
                 surfaceViewSetter = { glSurfaceRef.value = it }
             )
 
-            // ✅ Prawy dolny róg — przyciski zdjęcie/wideo
+            // Prawy dolny róg — przyciski zdjęcie
             Column(
                 modifier = if (isPortrait) {
                     Modifier
@@ -126,7 +121,7 @@ class CameraManager(
 
             }
 
-            // ✅ Lewy dolny róg — przycisk galerii
+            //Lewy dolny róg — przycisk galerii
             FloatingActionButton(
                 onClick = onGalleryClick,
                 modifier = Modifier
