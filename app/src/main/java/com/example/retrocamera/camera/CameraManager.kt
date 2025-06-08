@@ -8,27 +8,19 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.Size
 import android.view.PixelCopy
 import android.view.SurfaceView
 import android.widget.Toast
-import androidx.camera.core.*
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.FlipCameraAndroid
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import com.example.retrocamera.filters.CameraShaderRenderer
 import com.example.retrocamera.ui.CameraShaderScreen
 import java.io.OutputStream
@@ -37,8 +29,7 @@ import java.util.*
 
 
 class CameraManager(
-    private val context: Context,
-
+    private val context: Context
 ) {
     private var shaderRenderer: CameraShaderRenderer? = null
 
