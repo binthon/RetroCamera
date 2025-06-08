@@ -34,61 +34,15 @@ import com.example.retrocamera.ui.CameraShaderScreen
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
+
 
 class CameraManager(
     private val context: Context,
-    private val previewView: PreviewView? = null,
-    private val lifecycleOwner: LifecycleOwner
+
 ) {
-    private val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-    private var camera: Camera? = null
-    private var imageCapture: ImageCapture? = null
     private var shaderRenderer: CameraShaderRenderer? = null
 
-    fun startCamera() {
-        if (previewView == null) return
 
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-
-            val preview = Preview.Builder()
-                .setTargetResolution(Size(1280, 720))
-                .build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
-
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-            imageCapture = ImageCapture.Builder()
-                .setTargetResolution(Size(1280, 720))
-                .build()
-
-            try {
-                cameraProvider.unbindAll()
-                camera = cameraProvider.bindToLifecycle(
-                    lifecycleOwner,
-                    cameraSelector,
-                    preview,
-                    imageCapture
-                )
-            } catch (e: Exception) {
-                Toast.makeText(context, "Błąd kamery: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }, ContextCompat.getMainExecutor(context))
-    }
-
-    fun tapToFocus(x: Float, y: Float) {
-        previewView?.let {
-            val factory = it.meteringPointFactory
-            val point = factory.createPoint(x, y)
-
-            val action = FocusMeteringAction.Builder(point, FocusMeteringAction.FLAG_AF)
-                .setAutoCancelDuration(3, TimeUnit.SECONDS)
-                .build()
-
-            camera?.cameraControl?.startFocusAndMetering(action)
-        }
-    }
 
     fun setShaderRenderer(renderer: CameraShaderRenderer) {
         shaderRenderer = renderer

@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
                 composable("camera") {
                     val cameraManager = CameraManager(
                         context = this@MainActivity,
-                        lifecycleOwner = this@MainActivity
+
                     )
                     cameraManager.ShowCameraWithShader(
                         onGalleryClick = { navController.navigate("gallery") }
