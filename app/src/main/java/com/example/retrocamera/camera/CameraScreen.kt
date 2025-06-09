@@ -30,6 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.retrocamera.filters.CameraShaderRenderer
 import java.util.concurrent.Executors
 
+// podłączenie cameraX z GLSurfaceView
 @Composable
 fun CameraShaderScreen(
     shaderRendererSetter: (CameraShaderRenderer) -> Unit,
@@ -38,7 +39,7 @@ fun CameraShaderScreen(
     val context = LocalContext.current
     val activity = context as Activity
     val lifecycleOwner = context as LifecycleOwner
-
+    // uprawnienia do kamery
     val hasPermission = remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
@@ -55,14 +56,18 @@ fun CameraShaderScreen(
         Text("Brak dostępu do kamery", color = Color.White)
         return
     }
+
+    // towrzenie viewModel do sterowania filtrami, umożliwia zmianę filtru
     val cameraViewModel: CameraViewModel = viewModel()
     val selectedFilter = cameraViewModel.selectedFilter
     val surfaceTexture = cameraViewModel.surfaceTexture
 
+
+    // inicjalizacja nakładania filtru na kamere
     val renderer = remember {
         cameraViewModel.initRenderer(context)
     }
-
+    // incjowanie OpenGL
     val glSurfaceView = remember {
         GLSurfaceView(context).apply {
             setEGLContextClientVersion(2)
@@ -73,7 +78,7 @@ fun CameraShaderScreen(
         }
     }
 
-
+    // podłaczenie  tylnej kamery
     LaunchedEffect(surfaceTexture.value) {
         surfaceTexture.value?.let { tex ->
             val cameraProvider = ProcessCameraProvider.getInstance(context).get()
@@ -91,6 +96,7 @@ fun CameraShaderScreen(
         }
     }
 
+    // wyswietlenie poprzez android view filtru na kamerze
     Box(Modifier.fillMaxSize()) {
         AndroidView(factory = { glSurfaceView }, modifier = Modifier.fillMaxSize())
         ShaderFilterDropdown(
@@ -104,7 +110,7 @@ fun CameraShaderScreen(
     }
 }
 
-
+// dropmenu z opcja wyboru filtru
 @Composable
 fun ShaderFilterDropdown(
     modifier: Modifier = Modifier,
@@ -175,5 +181,16 @@ fun ShaderFilterDropdown(
             }
         }
     }
-
 }
+
+//MainActivity → CameraManager.ShowCameraWithShader()
+//                  ↓
+//CameraShaderScreen()
+//                  ↓
+//GLSurfaceView + CameraShaderRenderer
+//                  ↓
+//onSurfaceCreated() → SurfaceTexture tworzony
+//                  ↓
+//CameraX → dostaje Surface z SurfaceTexture
+//                  ↓
+//Obraz z kamery → SurfaceTexture → Renderer → ekran z shaderem

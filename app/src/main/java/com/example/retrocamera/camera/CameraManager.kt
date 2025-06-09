@@ -25,15 +25,16 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-
+//warstwa miedzy logiką a wartwą UI
 class CameraManager(
     private val context: Context,
     private val viewModel: CameraViewModel
 ) {
 
-
+    // funkcja do zapisu zdjęcia w galerii
     private fun saveBitmapToGallery(bitmap: Bitmap) {
         val filename = "ShaderPhoto_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())}.jpg"
+        // dane do zapisu
         val contentValues = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
@@ -43,6 +44,7 @@ class CameraManager(
         val resolver = context.contentResolver
         val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 
+        // zapis bitmapy jako jpeg
         uri?.let {
             val outputStream: OutputStream? = resolver.openOutputStream(it)
             outputStream?.use { stream ->
@@ -58,6 +60,8 @@ class CameraManager(
         }
     }
 
+
+    // główna funckcja programu która pokazuje kamere z filtrem, ikony
     @Composable
     fun ShowCameraWithShader(onGalleryClick: () -> Unit) {
         val glSurfaceRef = remember { mutableStateOf<SurfaceView?>(null) }
@@ -66,7 +70,9 @@ class CameraManager(
 
         Box(modifier = Modifier.fillMaxSize()) {
             CameraShaderScreen(
+                // render camerashader na viewmodel
                 shaderRendererSetter = { viewModel.shaderRenderer.value = it },
+                //referencja przez surfaceview do glsurfaceref
                 surfaceViewSetter = { glSurfaceRef.value = it }
             )
 

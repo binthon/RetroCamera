@@ -15,12 +15,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.graphics.painter.Painter
 import coil.compose.rememberAsyncImagePainter
+
 @OptIn(ExperimentalMaterial3Api::class)
+// towrzenie okna gallerii
 @Composable
 fun GalleryScreen(viewModel: GalleryViewModel, onBackToCamera: () -> Unit) {
+    //uri do zdjecia
     var selectedImage by rememberSaveable { mutableStateOf<Uri?>(null) }
-
-
+    // górny pasek nawigacyjny
     Scaffold(
         topBar = {
             TopAppBar(
@@ -45,6 +47,7 @@ fun GalleryScreen(viewModel: GalleryViewModel, onBackToCamera: () -> Unit) {
             )
         }
     ) { padding ->
+        // okno jednego zdjęcia, wywołanie funkcje usuwania i zapisu zdjecia
         selectedImage?.let { selected ->
             val index = viewModel.images.indexOf(selected).coerceAtLeast(0)
             GalleryElement(
@@ -62,13 +65,14 @@ fun GalleryScreen(viewModel: GalleryViewModel, onBackToCamera: () -> Unit) {
             return@Scaffold
         }
 
-
+        // siatka miniatur, 3 w rzedzie
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             contentPadding = padding,
             modifier = Modifier.fillMaxSize()
         ) {
             items(viewModel.images) { uri ->
+                // użice bibioteki coil do odczytu obrazu na podstawie uri
                 val painter: Painter = rememberAsyncImagePainter(model = uri)
                 Image(
                     painter = painter,
@@ -77,6 +81,7 @@ fun GalleryScreen(viewModel: GalleryViewModel, onBackToCamera: () -> Unit) {
                     modifier = Modifier
                         .padding(4.dp)
                         .aspectRatio(1f)
+                        //wybranie zdjecia uruchamia okno gallery element
                         .clickable { selectedImage = uri }
                 )
             }

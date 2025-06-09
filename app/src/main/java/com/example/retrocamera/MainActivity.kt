@@ -22,10 +22,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+// zapis logowania do google
 object AuthSession {
     var accessToken: String? = null
 }
+
+// clientID pobrany z gradle.properties
 const val clientId = BuildConfig.GOOGLE_CLIENT_ID
+
+
 
 class MainActivity : ComponentActivity() {
 
@@ -34,23 +39,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+            // nawigacja nav
             val navController = rememberNavController()
 
             NavHost(navController = navController, startDestination = "camera") {
                 composable("camera") {
+                    //viewmodel przechowuje filtr i sufaceTexture
                     val cameraViewModel: CameraViewModel = viewModel()
+
+                    //logika i działanie kamery
                     val cameraManager = CameraManager(
                         context = this@MainActivity,
                         viewModel = cameraViewModel
                     )
+
+                    // ui kamery z shaderem
                     cameraManager.ShowCameraWithShader(
                         onGalleryClick = { navController.navigate("gallery") }
                     )
                 }
 
+                // ekran galeruu
                 composable("gallery") {
                     GalleryScreen(
                         viewModel = GalleryViewModel(this@MainActivity),
+                        //powrót do kamery
                         onBackToCamera = { navController.popBackStack() }
                     )
                 }
@@ -61,6 +74,7 @@ class MainActivity : ComponentActivity() {
         val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .requestScopes(
+                // Potrzebne do odczytu/zapisu zdjęć z Google Photos
                 Scope("https://www.googleapis.com/auth/photoslibrary.appendonly"),
                 Scope("https://www.googleapis.com/auth/photoslibrary.readonly")
             )
@@ -68,7 +82,7 @@ class MainActivity : ComponentActivity() {
             .build()
 
         val googleSignInClient = GoogleSignIn.getClient(this, signInOptions)
-
+        //jak nie ma tokena to logowanie
         if (AuthSession.accessToken == null) {
             val signInIntent = googleSignInClient.signInIntent
             startActivityForResult(signInIntent, 123)
@@ -77,7 +91,7 @@ class MainActivity : ComponentActivity() {
 
     }
 
-
+    // powrót z logowania
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -86,6 +100,7 @@ class MainActivity : ComponentActivity() {
             if (task.isSuccessful) {
                 val account = task.result
                 val authCode = account.serverAuthCode
+                // jeśli jest authcode to wymiana na token
                 if (authCode != null) {
                     CoroutineScope(Dispatchers.IO).launch {
                         val token = exchangeAuthCodeForAccessToken(this@MainActivity, authCode)
@@ -101,3 +116,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+// czyli w mainacivity jest autoryazcja authCode wysyłany do exchangeAuthCodeForAccessToken gdzie po poprawny pobraniu
+// access_token funkcja moze wrzucić plik do google photos

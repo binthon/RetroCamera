@@ -14,6 +14,11 @@ import java.nio.IntBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
+//CameraX → SurfaceTexture → CameraShaderRenderer (OpenGL) → ekran GLSurfaceView
+//                             ↑
+//                  wybrany shader (GLSL) z ViewModelu
+
+
 class CameraShaderRenderer(
     private val context: android.content.Context,
     private val cameraTextureId: IntArray,
@@ -29,6 +34,7 @@ class CameraShaderRenderer(
     private var captureRequested: Boolean = false
     private var captureCallback: ((Bitmap) -> Unit)? = null
 
+    // tworzenie tekstury GL z obrazem z kamery, kompilacja shaderu
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glGenTextures(1, cameraTextureId, 0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, cameraTextureId[0])
@@ -36,7 +42,7 @@ class CameraShaderRenderer(
         GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
 
         surfaceTexture.value = SurfaceTexture(cameraTextureId[0]).apply {
-            setDefaultBufferSize(1280, 720)
+            setDefaultBufferSize(1920, 1080)
         }
 
         programHandle = compileShaderProgram(selectedFilter.value)
@@ -47,10 +53,12 @@ class CameraShaderRenderer(
         this.width = width
         this.height = height
     }
-
+    // wykonyanie co klatke nakładania filtru
     override fun onDrawFrame(gl: GL10?) {
+        // aktualizacja obrazu z tekstu, jakby pobieranie tego co na kamerze
         surfaceTexture.value?.updateTexImage()
 
+        //zmiana shadera jeśli wybrano inny filtr
         if (lastAppliedFilter != selectedFilter.value) {
             GLES20.glDeleteProgram(programHandle)
             programHandle = compileShaderProgram(selectedFilter.value)
@@ -59,12 +67,10 @@ class CameraShaderRenderer(
 
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
         GLES20.glUseProgram(programHandle)
-
+        //wierzchołki pozycji nakładanego filtru
         val vertexCoords = floatArrayOf(
             -1f, -1f, 1f, -1f, -1f, 1f, 1f, 1f
         )
-
-        val rotation = (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
 
         val texCoords = floatArrayOf(
             0f, 1f,
@@ -86,17 +92,22 @@ class CameraShaderRenderer(
                 put(texCoords)
                 position(0)
             }
-
+        //aPosition – pozycje wierzchołków (x, y)
+        //aTexCoord – UV tekstury (mapowanie obrazu)
+        //uTexture – tekstura kamery
         val aPosition = GLES20.glGetAttribLocation(programHandle, "aPosition")
         val aTexCoord = GLES20.glGetAttribLocation(programHandle, "aTexCoord")
         val uTexture = GLES20.glGetUniformLocation(programHandle, "uTexture")
 
+
+        //przekazywanie bufowa filtry do GPU
         GLES20.glEnableVertexAttribArray(aPosition)
         GLES20.glVertexAttribPointer(aPosition, 2, GLES20.GL_FLOAT, false, 0, vertexBuffer)
 
         GLES20.glEnableVertexAttribArray(aTexCoord)
         GLES20.glVertexAttribPointer(aTexCoord, 2, GLES20.GL_FLOAT, false, 0, texBuffer)
 
+        //aktywowanie tekstury filtru
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, cameraTextureId[0])
         GLES20.glUniform1i(uTexture, 0)
@@ -106,6 +117,8 @@ class CameraShaderRenderer(
         GLES20.glDisableVertexAttribArray(aPosition)
         GLES20.glDisableVertexAttribArray(aTexCoord)
 
+
+        //kopiowanie obrazu z buforwa OpenGL do bitmapy
         if (captureRequested) {
             val buffer = IntArray(width * height)
             val intBuffer = IntBuffer.wrap(buffer)
@@ -127,15 +140,10 @@ class CameraShaderRenderer(
         }
     }
 
-    fun requestFrameCapture(callback: (Bitmap) -> Unit) {
-        captureRequested = true
-        captureCallback = callback
-    }
-
-
     private fun compileShaderProgram(filter: String): Int {
+        //próba wyłapania orientacji telefonu
         val rotation = (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
-
+        // rózne ustawienia wierzchołków dla pionu i poziomy telefonu w celu dostoswania filtrów do obrazu z kamery
         val vertexShaderCode = if (rotation == Surface.ROTATION_0) {
             """
                 attribute vec4 aPosition;
@@ -475,7 +483,5 @@ class CameraShaderRenderer(
         GLES20.glCompileShader(shader)
         return shader
     }
-
-    fun getSurfaceTexture(): SurfaceTexture? = surfaceTexture.value
 
 }

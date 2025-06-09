@@ -15,28 +15,29 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import java.io.File
 import com.example.retrocamera.BuildConfig
+//pobranie stałych z gradle.properties, tak żeby klucze były niewidoczne
 val clientId = BuildConfig.GOOGLE_CLIENT_ID
 val clientSecret = BuildConfig.GOOGLE_CLIENT_SECRET
 class GooglePhotosApiClient(private val context: Context) {
 
     private val client = OkHttpClient()
 
-
     suspend fun uploadImageToGooglePhotos(uri: Uri): Boolean = withContext(Dispatchers.IO) {
         try {
+            // sprawdzenie token
             if (accessToken == null) {
                 val account = GoogleSignIn.getLastSignedInAccount(context)
                 val authCode = account?.serverAuthCode
                 accessToken = authCode?.let { exchangeAuthCodeForAccessToken(context, it) }
             }
-
+            // wspólny dla całej apki
             val token = AuthSession.accessToken ?: return@withContext false
 
             val file = File(uri.path ?: return@withContext false)
             val mediaType = "image/jpeg".toMediaTypeOrNull()
             val requestBody = file.asRequestBody(mediaType)
 
-            // Krok 1: Upload
+            // Krok 1: Upload w binarce
             val uploadRequest = Request.Builder()
                 .url("https://photoslibrary.googleapis.com/v1/uploads")
                 .addHeader("Authorization", "Bearer $token")
@@ -89,8 +90,8 @@ class GooglePhotosApiClient(private val context: Context) {
     }
 
 }
-
-suspend fun exchangeAuthCodeForAccessToken(context: Context, authCode: String): String? {
+// reguest do otrzymania tokenu do wrzucenia zdjecia,
+fun exchangeAuthCodeForAccessToken(context: Context, authCode: String): String? {
     return try {
 
         val formBody = okhttp3.FormBody.Builder()

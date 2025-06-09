@@ -29,9 +29,12 @@ fun GalleryElement(
     onDeleteClick: (Uri) -> Unit,
     onSyncClick: (Uri) -> Unit
 ) {
-    val pagerState = rememberPagerState(initialPage = startIndex)
 
+    //zapamietanie indexu zdjecia
+    val pagerState = rememberPagerState(initialPage = startIndex)
+    //layout na fullscreen
     Box(modifier = Modifier.fillMaxSize()) {
+        // możliwośc przewijania galerii
         HorizontalPager(
             count = images.size,
             state = pagerState,
@@ -45,7 +48,7 @@ fun GalleryElement(
                 modifier = Modifier.fillMaxSize()
             )
         }
-
+        // górny topappbar do powórtu do galerii
         TopAppBar(
             title = { Text("Podgląd zdjęcia", color = Color.White) },
             navigationIcon = {
@@ -59,8 +62,10 @@ fun GalleryElement(
                 .height(56.dp)
                 .align(Alignment.TopStart)
         )
+        // zmienne odnośnie orientacji ekranu
         val configuration = LocalConfiguration.current
         val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        // dolny appbar do schronizacji zdjecia z google photos
         Row(
             modifier = Modifier
                 .fillMaxWidth()
