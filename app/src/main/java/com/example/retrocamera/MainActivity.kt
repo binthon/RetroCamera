@@ -21,13 +21,12 @@ import com.google.android.gms.common.api.Scope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.example.retrocamera.BuildConfig
+
 
 object AuthSession {
     var accessToken: String? = null
 }
-val clientId = BuildConfig.GOOGLE_CLIENT_ID
-
+const val clientId = BuildConfig.GOOGLE_CLIENT_ID
 
 class MainActivity : ComponentActivity() {
 
@@ -78,6 +77,7 @@ class MainActivity : ComponentActivity() {
 
 
     }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

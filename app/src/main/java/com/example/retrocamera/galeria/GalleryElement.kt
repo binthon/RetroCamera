@@ -1,10 +1,9 @@
 package com.example.retrocamera.galeria
 
 import android.net.Uri
-import android.content.res.Configuration
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -15,75 +14,76 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import androidx.compose.ui.platform.LocalConfiguration
+import android.content.res.Configuration
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GalleryElement(
-    uri: Uri,
+    images: List<Uri>,
+    startIndex: Int,
     onClose: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onSyncClick: () -> Unit
+    onDeleteClick: (Uri) -> Unit,
+    onSyncClick: (Uri) -> Unit
 ) {
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val pagerState = rememberPagerState(initialPage = startIndex)
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        Image(
-            painter = rememberAsyncImagePainter(uri),
-            contentDescription = null,
-            contentScale = ContentScale.Fit,
+    Box(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            count = images.size,
+            state = pagerState,
             modifier = Modifier.fillMaxSize()
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .zIndex(1f)
-                .align(Alignment.TopStart)
-        ) {
-            TopAppBar(
-                title = { Text("Podgląd zdjęcia", color = Color.White) },
-                navigationIcon = {
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Wróć", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(if (isLandscape) 48.dp else 64.dp)
+        ) { page ->
+            val uri = images[page]
+            Image(
+                painter = rememberAsyncImagePainter(uri),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
             )
         }
 
-        val bottomPadding = if (isLandscape) 16.dp else 64.dp
-
+        TopAppBar(
+            title = { Text("Podgląd zdjęcia", color = Color.White) },
+            navigationIcon = {
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Wróć", tint = Color.White)
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .align(Alignment.TopStart)
+        )
+        val configuration = LocalConfiguration.current
+        val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(start = 16.dp, end = 16.dp, bottom = bottomPadding)
-                .zIndex(1f),
+                .padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = if (isPortrait) 64.dp else 16.dp
+                ),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(onClick = onSyncClick) {
-                Icon(Icons.Default.Sync, contentDescription = "Synchronizuj")
+            val currentUri = images[pagerState.currentPage]
+            Button(onClick = { onSyncClick(currentUri) }) {
+                Icon(Icons.Default.Sync, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Synchronizuj")
             }
-            Button(onClick = onDeleteClick) {
-                Icon(Icons.Default.Delete, contentDescription = "Usuń zdjęcie")
+            Button(onClick = { onDeleteClick(currentUri) }) {
+                Icon(Icons.Default.Delete, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Usuń zdjęcie")
             }
         }
-
     }
 }

@@ -45,21 +45,23 @@ fun GalleryScreen(viewModel: GalleryViewModel, onBackToCamera: () -> Unit) {
             )
         }
     ) { padding ->
-        selectedImage?.let {
+        selectedImage?.let { selected ->
+            val index = viewModel.images.indexOf(selected).coerceAtLeast(0)
             GalleryElement(
-                uri = it,
+                images = viewModel.images,
+                startIndex = index,
                 onClose = { selectedImage = null },
-                onDeleteClick = {
-                    viewModel.deleteImage(it)
+                onDeleteClick = { uri ->
+                    viewModel.deleteImage(uri)
                     selectedImage = null
                 },
-                onSyncClick = {
-                    viewModel.uploadToGooglePhotos(it)
+                onSyncClick = { uri ->
+                    viewModel.uploadToGooglePhotos(uri)
                 }
             )
-
             return@Scaffold
         }
+
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),

@@ -21,6 +21,7 @@ class GooglePhotosApiClient(private val context: Context) {
 
     private val client = OkHttpClient()
 
+
     suspend fun uploadImageToGooglePhotos(uri: Uri): Boolean = withContext(Dispatchers.IO) {
         try {
             if (accessToken == null) {
@@ -53,7 +54,7 @@ class GooglePhotosApiClient(private val context: Context) {
                 return@withContext false
             }
 
-            // Krok 2: Dodaj zdjęcie do biblioteki (bez albumu)
+            // Krok 2: Dodaj zdjęcie do biblioteki
             val json = """
             {
               "newMediaItems": [

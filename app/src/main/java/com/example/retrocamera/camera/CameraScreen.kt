@@ -78,7 +78,7 @@ fun CameraShaderScreen(
         surfaceTexture.value?.let { tex ->
             val cameraProvider = ProcessCameraProvider.getInstance(context).get()
             val preview = Preview.Builder()
-                .setTargetResolution(Size(720, 1280))
+                .setTargetResolution(Size(1080, 1920))
                 .build()
 
             val surface = Surface(tex)
