@@ -46,9 +46,18 @@ fun GalleryScreen(viewModel: GalleryViewModel, onBackToCamera: () -> Unit) {
         }
     ) { padding ->
         selectedImage?.let {
-            GalleryElement(uri = it) {
-                selectedImage = null
-            }
+            GalleryElement(
+                uri = it,
+                onClose = { selectedImage = null },
+                onDeleteClick = {
+                    viewModel.deleteImage(it)
+                    selectedImage = null
+                },
+                onSyncClick = {
+                    viewModel.uploadToGooglePhotos(it)
+                }
+            )
+
             return@Scaffold
         }
 

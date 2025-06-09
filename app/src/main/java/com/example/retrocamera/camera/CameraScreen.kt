@@ -1,9 +1,8 @@
-package com.example.retrocamera.ui
+package com.example.retrocamera.camera
 
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
-import android.graphics.SurfaceTexture
 import android.opengl.GLSurfaceView
 import android.util.Size
 import android.view.Surface
@@ -27,6 +26,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.retrocamera.filters.CameraShaderRenderer
 import java.util.concurrent.Executors
 
@@ -55,26 +55,24 @@ fun CameraShaderScreen(
         Text("Brak dostępu do kamery", color = Color.White)
         return
     }
+    val cameraViewModel: CameraViewModel = viewModel()
+    val selectedFilter = cameraViewModel.selectedFilter
+    val surfaceTexture = cameraViewModel.surfaceTexture
 
-    val selectedFilter = rememberSaveable { mutableStateOf("Normal") }
-    val cameraTextureId = remember { IntArray(1) }
-    val surfaceTexture = remember { mutableStateOf<SurfaceTexture?>(null) }
+    val renderer = remember {
+        cameraViewModel.initRenderer(context)
+    }
 
     val glSurfaceView = remember {
         GLSurfaceView(context).apply {
             setEGLContextClientVersion(2)
-            val renderer = CameraShaderRenderer(
-                context = context,
-                cameraTextureId = cameraTextureId,
-                surfaceTexture = surfaceTexture,
-                selectedFilter = selectedFilter
-            )
             shaderRendererSetter(renderer)
             surfaceViewSetter(this)
             setRenderer(renderer)
             renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
         }
     }
+
 
     LaunchedEffect(surfaceTexture.value) {
         surfaceTexture.value?.let { tex ->
@@ -99,7 +97,10 @@ fun CameraShaderScreen(
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(20.dp)
-        ) { selectedFilter.value = it }
+        ) {
+            selectedFilter.value = it
+        }
+
     }
 }
 

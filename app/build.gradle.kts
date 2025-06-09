@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+
 }
+
+
 
 android {
     namespace = "com.example.retrocamera"
@@ -18,7 +21,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"${project.properties["GOOGLE_CLIENT_ID"]}\"")
+        buildConfigField("String", "GOOGLE_CLIENT_SECRET", "\"${project.properties["GOOGLE_CLIENT_SECRET"]}\"")
+
     }
+
 
     buildTypes {
         release {
@@ -38,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -84,5 +93,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.compose.material3:material3:1.1.2")
+    implementation ("com.google.android.gms:play-services-auth:20.7.0")
+
 
 }

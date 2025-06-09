@@ -21,8 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.retrocamera.filters.CameraShaderRenderer
-import com.example.retrocamera.ui.CameraShaderScreen
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
