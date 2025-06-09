@@ -20,8 +20,10 @@ val clientId = BuildConfig.GOOGLE_CLIENT_ID
 val clientSecret = BuildConfig.GOOGLE_CLIENT_SECRET
 class GooglePhotosApiClient(private val context: Context) {
 
+    // wywłanie obiektu do komunikacji http
     private val client = OkHttpClient()
 
+    //funkcja asynchroniczna, przakazana do operacji sieciowych
     suspend fun uploadImageToGooglePhotos(uri: Uri): Boolean = withContext(Dispatchers.IO) {
         try {
             // sprawdzenie token

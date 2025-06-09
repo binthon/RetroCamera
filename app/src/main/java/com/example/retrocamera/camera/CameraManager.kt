@@ -49,6 +49,7 @@ class CameraManager(
             val outputStream: OutputStream? = resolver.openOutputStream(it)
             outputStream?.use { stream ->
                 val success = bitmap.compress(Bitmap.CompressFormat.JPEG, 95, stream)
+                // po przekazaniu zapisu do backgroudy tu dostaje odp o sukcesie lub nie odnośnie zapisu
                 Handler(Looper.getMainLooper()).post {
                     Toast.makeText(
                         context,
@@ -104,6 +105,7 @@ class CameraManager(
                         val handler = Handler(Looper.getMainLooper())
 
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            // uzycie pixelcopy do przekazania bitmay z obrazu
                             PixelCopy.request(view, bitmap, { result ->
                                 if (result == PixelCopy.SUCCESS) {
                                     saveBitmapToGallery(bitmap)

@@ -102,6 +102,7 @@ class MainActivity : ComponentActivity() {
                 val authCode = account.serverAuthCode
                 // jeśli jest authcode to wymiana na token
                 if (authCode != null) {
+                    //wątek współbieżny, kamera działa w tle
                     CoroutineScope(Dispatchers.IO).launch {
                         val token = exchangeAuthCodeForAccessToken(this@MainActivity, authCode)
                         AuthSession.accessToken = token
