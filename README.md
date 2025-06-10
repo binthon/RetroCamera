@@ -1,6 +1,6 @@
 # RetroCamera 📸
 
-RetroCamera to aplikacja na Androida inspirowana klasycznymi aparatami fotograficznymi. Umożliwia robienie zdjęć z efektami w stylu retro, filtrowanie ich oraz przeglądanie wykonanych zdjęć w galerii.
+RetroCamera to aplikacja na Androida inspirowana klasycznymi aparatami fotograficznymi. Umożliwia robienie zdjęć z efektami w stylu retro, wybieranie filtru oraz przeglądanie wykonanych zdjęć w galerii.
 
 ## Funkcje
 - Logowanie do konta Google 
