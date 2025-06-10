@@ -11,28 +11,28 @@ RetroCamera to aplikacja na Androida inspirowana klasycznymi aparatami fotografi
 - Usuwanie wybranego zdjęcia
 - Sychronizacja zdjęcia do Google Photos
 
-## Główne komponenty aplikacji
- # MainActivity.kt
+# Główne komponenty aplikacji
+ ## MainActivity.kt
 - Uruchamia aplikację.
 - Konfiguruje nawigację między ekranem kamery a galerią.
 - Obsługuje logowanie przez Google (OAuth2) i zapisuje token dostępu.
 - Przechowuje token globalnie w AuthSession.accessToken.
 
-  # CameraManager.kt
+  ## CameraManager.kt
 - Wyświetla kamerę z aktywnym shaderem (filtr graficzny).
 - Obsługuje robienie zdjęcia (przez PixelCopy) i zapisuje je w galerii (MediaStore).
 - Tworzy przyciski UI do robienia zdjęć i otwierania galerii.
 
- # CameraScreen.kt
+ ## CameraScreen.kt
 - Łączy kamerę z widokiem OpenGL (GLSurfaceView) i nakłada wybrany filtr.
 - Renderuje CameraShaderRenderer w czasie rzeczywistym.
 - Obsługuje wybór filtra z dropdown menu (ShaderFilterDropdown).
 
- # CameraViewModel.kt
+ ## CameraViewModel.kt
 - Przechowuje aktualny stan renderera, tekstury oraz wybrany filtr.
 - Ułatwia komunikację między UI a logiką renderowania kamery.
 
- # Shader.kt
+ ## Shader.kt
 - Główna klasa CameraShaderRenderer odpowiada za rysowanie obrazu kamery z nałożonym shaderem (OpenGL).
 Obsługuje:
 - Tworzenie tekstury i SurfaceTexture.
@@ -40,25 +40,25 @@ Obsługuje:
 - Rysowanie obrazu z shaderem w czasie rzeczywistym.
 - Robienie zdjęć (kopiowanie obrazu z GPU do bitmapy).
 - Zawiera implementacje działania filtrów
- # GalleryScreen.kt
+ ## GalleryScreen.kt
 - Wyświetla ekran galerii z miniaturami w siatce (3 kolumny).
 - Obsługuje przełączanie się między trybem przeglądania a szczegółowym widokiem zdjęcia.
 - Integruje z GalleryViewModel do operacji na zdjęciach.
 
- # GalleryElement.kt
+ ## GalleryElement.kt
 Widok szczegółowy zdjęcia. Umożliwia:
 - Synchronizację zdjęcia z Google Photos.
 - Usunięcie zdjęcia.
 - Umożliwia przewijanie zdjęć w galerii.
 
- # GalleryView.kt
+ ## GalleryView.kt
 Przechowuje listę zdjęć.
 - Ładuje zdjęcia z folderu Pictures/RetroCamera.
 Obsługuje:
 - Usuwanie zdjęć.
 - Wysyłanie zdjęć do Google Photos przez GooglePhotosApiClient.
 
-# API i autoryzacja do Google
+## API i autoryzacja do Google
 - Klient API do Google Photos (GooglePhotosApiClient).
 - Funkcja uploadImageToGooglePhotos(uri):
 - Wysyła zdjęcie jako binarkę.
@@ -72,6 +72,6 @@ Funkcja exchangeAuthCodeForAccessToken():
   GOOGLE_CLIENT_SECRET=""
   Może użyć do tego Google Cloud Console
 
-# Współdzielone dane
+## Współdzielone dane
 - AuthSession (w MainActivity.kt)
 - Globalna zmienna przechowująca token dostępu OAuth2 (accessToken).
