@@ -68,8 +68,8 @@ Funkcja exchangeAuthCodeForAccessToken():
 - Wymienia authCode na token OAuth2 (dostępowy).
 - Dane uwierzytelniające (clientId, clientSecret) pobierane z BuildConfig.
   W pliku gradle.properties należy uzupełnić pola:
-  GOOGLE_CLIENT_ID=""
-  GOOGLE_CLIENT_SECRET=""
+  ### GOOGLE_CLIENT_ID=""
+  ### GOOGLE_CLIENT_SECRET=""
   Może użyć do tego Google Cloud Console
 
 ## Współdzielone dane
