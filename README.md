@@ -75,3 +75,14 @@ Funkcja exchangeAuthCodeForAccessToken():
 ## Współdzielone dane
 - AuthSession (w MainActivity.kt)
 - Globalna zmienna przechowująca token dostępu OAuth2 (accessToken).
+
+# Wygląd aplikacji
+![Zdjęcie WhatsApp 2025-06-10 o 10 20 46_d99bcb15](https://github.com/user-attachments/assets/03990602-26cc-497f-8d66-b1193afd9dd8)
+![Zdjęcie WhatsApp 2025-06-10 o 10 20 45_65fff3e0](https://github.com/user-attachments/assets/a7fb487f-8dfd-4d9f-9951-ed02b5808bbe)
+![Zdjęcie WhatsApp 2025-06-10 o 10 20 46_c5c74bde](https://github.com/user-attachments/assets/eaca5e6a-3648-47ba-ba30-74700fab24b1)
+![Zdjęcie WhatsApp 2025-06-10 o 10 20 46_198c8382](https://github.com/user-attachments/assets/9da01e52-a00d-4e68-9caf-0ced145aee15)
+![Zdjęcie WhatsApp 2025-06-10 o 10 20 46_454cc52d](https://github.com/user-attachments/assets/c7abab16-2420-43e3-a4c1-b3a62759d8af)
+![Zdjęcie WhatsApp 2025-06-10 o 10 20 45_6ea2d671](https://github.com/user-attachments/assets/aff6fb13-2704-450f-9217-3d8cdb0467f9)
+![Zdjęcie WhatsApp 2025-06-10 o 10 20 46_9839fb71](https://github.com/user-attachments/assets/1f208ac9-73a5-457f-85bd-94a90a4dad4a)
+
+
