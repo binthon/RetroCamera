@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import com.example.retrocamera.filters.CameraShaderRenderer
 
-//logika viewModel, przechowyanie stanu shdera, przechowywanie tekstury
+//logika viewModel, przechowyanie stanu shdera, przechowywanie tekstury, zapamiętanie stanu
 class CameraViewModel : ViewModel() {
     val shaderRenderer = mutableStateOf<CameraShaderRenderer?>(null)
     val surfaceTexture = mutableStateOf<SurfaceTexture?>(null)
