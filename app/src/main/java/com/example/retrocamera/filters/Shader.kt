@@ -144,6 +144,8 @@ class CameraShaderRenderer(
         //próba wyłapania orientacji telefonu
         val rotation = (context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager).defaultDisplay.rotation
         // rózne ustawienia wierzchołków dla pionu i poziomy telefonu w celu dostoswania filtrów do obrazu z kamery
+
+        //shadery działają na podstawie obliczania luminacji kazdego pixel i zmieny tej wartości
         val vertexShaderCode = if (rotation == Surface.ROTATION_0) {
             """
                 attribute vec4 aPosition;
@@ -165,11 +167,12 @@ class CameraShaderRenderer(
                 }
             """
         }.trimIndent()
+        // trimIndent pozwala na usunęcie zbędnych wcięć 
 
 
         val fragmentShaderCode = when (filter) {
             "Thermal" -> """
-                    #extension GL_OES_EGL_image_external : require
+                    #extension GL_OES_EGL_image_external : require 
                     precision mediump float;
                     uniform samplerExternalOES uTexture;
                     varying vec2 vTexCoord;
