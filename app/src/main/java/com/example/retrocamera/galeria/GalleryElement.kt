@@ -23,11 +23,11 @@ import android.content.res.Configuration
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GalleryElement(
-    images: List<Uri>,
-    startIndex: Int,
-    onClose: () -> Unit,
-    onDeleteClick: (Uri) -> Unit,
-    onSyncClick: (Uri) -> Unit
+    images: List<Uri>, // lista uri zdjęc w galerii
+    startIndex: Int, // indeks pierwszego zdjecia
+    onClose: () -> Unit, // funkcja przy zamknęciu podglądu zdj
+    onDeleteClick: (Uri) -> Unit, // funckja przy usuwaniu zdjecia
+    onSyncClick: (Uri) -> Unit // funckcja wywołania API
 ) {
 
     //zapamietanie indexu zdjecia
